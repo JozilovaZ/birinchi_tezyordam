@@ -1,0 +1,185 @@
+{% extends 'loyiha/base.html' %}
+
+{% block title %}{{ s.nav_quiz }} - {{ s.sayt_nomi }}{% endblock %}
+{% block nav_quiz %}active{% endblock %}
+
+{% block content %}
+{% if savollar %}
+<section class="quiz-page">
+    <div class="container">
+        <form action="{% url 'loyiha:test_tekshir' %}" method="post" id="testForm">
+            {% csrf_token %}
+
+            <!-- Quiz Header -->
+            <div class="quiz-header">
+                <div class="quiz-progress-info">
+                    <span class="quiz-label">SAVOL <span id="currentQ">1</span> DAN {{ savollar.count }} GACHA</span>
+                    <div class="quiz-progress-bar">
+                        <div class="quiz-progress-fill" id="quizProgress"></div>
+                    </div>
+                </div>
+                <div class="quiz-score">
+                    <span class="quiz-score-label">JAMI HISOB</span>
+                    <span class="quiz-score-value"><span id="totalScore">0</span> <small>ball</small></span>
+                </div>
+            </div>
+
+            <!-- Questions Container -->
+            <div class="quiz-body">
+                {% for savol in savollar %}
+                <div class="quiz-question {% if forloop.first %}active{% endif %}" data-index="{{ forloop.counter }}" data-id="{{ savol.id }}">
+                    <h2 class="quiz-question-text">{{ savol.savol }}</h2>
+                    <div class="quiz-options">
+                        <label class="quiz-option" data-value="a">
+                            <input type="radio" name="savol_{{ savol.id }}" value="a">
+                            <span class="quiz-option-marker">a.</span>
+                            <span class="quiz-option-text">{{ savol.variant_a }}</span>
+                            <span class="quiz-option-check">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </span>
+                        </label>
+                        <label class="quiz-option" data-value="b">
+                            <input type="radio" name="savol_{{ savol.id }}" value="b">
+                            <span class="quiz-option-marker">b.</span>
+                            <span class="quiz-option-text">{{ savol.variant_b }}</span>
+                            <span class="quiz-option-check">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </span>
+                        </label>
+                        <label class="quiz-option" data-value="c">
+                            <input type="radio" name="savol_{{ savol.id }}" value="c">
+                            <span class="quiz-option-marker">c.</span>
+                            <span class="quiz-option-text">{{ savol.variant_c }}</span>
+                            <span class="quiz-option-check">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </span>
+                        </label>
+                        <label class="quiz-option" data-value="d">
+                            <input type="radio" name="savol_{{ savol.id }}" value="d">
+                            <span class="quiz-option-marker">d.</span>
+                            <span class="quiz-option-text">{{ savol.variant_d }}</span>
+                            <span class="quiz-option-check">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </span>
+                        </label>
+                    </div>
+
+                    {% if savol.izoh %}
+                    <div class="quiz-tip" id="tip-{{ savol.id }}" style="display:none">
+                        <div class="quiz-tip-header">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                            {{ s.test_tip_matn }}
+                        </div>
+                        <p>{{ savol.izoh }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Quiz Navigation -->
+            <div class="quiz-nav">
+                <button type="button" class="btn btn-outline-dark" id="btnPrev" onclick="prevQuestion()" style="visibility:hidden">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    {{ s.test_oldingi_matn }}
+                </button>
+                <button type="button" class="btn btn-success" id="btnNext" onclick="nextQuestion()">
+                    {{ s.test_keyingi_matn }}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+                <button type="submit" class="btn btn-success" id="btnSubmit" style="display:none">
+                    {{ s.test_natija_btn }}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+{% else %}
+<section class="quiz-page">
+    <div class="container">
+        <div class="empty-state">
+            <p>Hozircha test savollari qo'shilmagan.</p>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const totalQuestions = {{ savollar.count|default:0 }};
+let currentQuestion = 1;
+let score = 0;
+const correctAnswers = {
+    {% for savol in savollar %}
+    '{{ savol.id }}': '{{ savol.togri_javob }}',
+    {% endfor %}
+};
+
+function showQuestion(num) {
+    document.querySelectorAll('.quiz-question').forEach(q => q.classList.remove('active'));
+    const q = document.querySelector(`.quiz-question[data-index="${num}"]`);
+    if (q) q.classList.add('active');
+
+    document.getElementById('currentQ').textContent = num;
+    document.getElementById('quizProgress').style.width = (num / totalQuestions * 100) + '%';
+
+    document.getElementById('btnPrev').style.visibility = num <= 1 ? 'hidden' : 'visible';
+
+    if (num >= totalQuestions) {
+        document.getElementById('btnNext').style.display = 'none';
+        document.getElementById('btnSubmit').style.display = 'inline-flex';
+    } else {
+        document.getElementById('btnNext').style.display = 'inline-flex';
+        document.getElementById('btnSubmit').style.display = 'none';
+    }
+}
+
+function nextQuestion() {
+    if (currentQuestion < totalQuestions) {
+        currentQuestion++;
+        showQuestion(currentQuestion);
+    }
+}
+
+function prevQuestion() {
+    if (currentQuestion > 1) {
+        currentQuestion--;
+        showQuestion(currentQuestion);
+    }
+}
+
+// Handle option selection
+document.querySelectorAll('.quiz-option').forEach(option => {
+    option.addEventListener('click', function() {
+        const question = this.closest('.quiz-question');
+        const options = question.querySelectorAll('.quiz-option');
+        options.forEach(o => o.classList.remove('selected'));
+        this.classList.add('selected');
+
+        // Show tip
+        const qId = question.dataset.id;
+        const tip = document.getElementById('tip-' + qId);
+        if (tip) tip.style.display = 'block';
+
+        // Update score
+        updateScore();
+    });
+});
+
+function updateScore() {
+    score = 0;
+    document.querySelectorAll('.quiz-question').forEach(q => {
+        const id = q.dataset.id;
+        const selected = q.querySelector('input[type="radio"]:checked');
+        if (selected && selected.value === correctAnswers[id]) {
+            score += 35;
+        }
+    });
+    document.getElementById('totalScore').textContent = score;
+}
+
+showQuestion(1);
+</script>
+{% endblock %}

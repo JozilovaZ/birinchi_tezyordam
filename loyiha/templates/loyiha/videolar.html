@@ -1,0 +1,53 @@
+{% extends 'loyiha/base.html' %}
+{% load static %}
+
+{% block title %}{{ s.video_sarlavha }} - {{ s.sayt_nomi }}{% endblock %}
+{% block nav_videolar %}active{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<section class="video-header">
+    <div class="container">
+        <h1 class="video-page-title">{{ s.video_sarlavha }}</h1>
+        <p class="video-page-subtitle">{{ s.video_tavsif }}</p>
+
+        <!-- Category Filter -->
+        <div class="video-filters">
+            <a href="{% url 'loyiha:videolar' %}" class="video-filter-btn {% if not tanlangan_kat %}active{% endif %}">{{ s.barchasi_filter }}</a>
+            {% for kat in kategoriyalar %}
+            <a href="{% url 'loyiha:videolar' %}?kategoriya={{ kat.pk }}" class="video-filter-btn {% if tanlangan_kat == kat.pk|stringformat:'d' %}active{% endif %}">{{ kat.icon }} {{ kat.nomi }}</a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Video Grid -->
+<section class="video-section">
+    <div class="container">
+        <div class="video-grid">
+            {% for video in videolar %}
+            <a href="{{ video.youtube_url }}" target="_blank" class="video-card">
+                <div class="video-card-thumb">
+                    <img src="{{ video.thumbnail }}" alt="{{ video.sarlavha }}">
+                    <div class="video-play-btn">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    </div>
+                    {% if video.kategoriya %}
+                    <span class="video-card-badge" style="background: {{ video.kategoriya.rang }}">{{ video.kategoriya.nomi }}</span>
+                    {% endif %}
+                </div>
+                <div class="video-card-body">
+                    <h3 class="video-card-title">{{ video.sarlavha }}</h3>
+                    <p class="video-card-desc">{{ video.tavsif|truncatewords:15 }}</p>
+                </div>
+            </a>
+            {% empty %}
+            <div class="video-empty">
+                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                <p>{{ s.video_bosh_matn }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

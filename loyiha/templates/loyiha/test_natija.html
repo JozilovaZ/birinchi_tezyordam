@@ -1,0 +1,60 @@
+{% extends 'loyiha/base.html' %}
+
+{% block title %}{{ s.test_batafsil_matn }} - {{ s.sayt_nomi }}{% endblock %}
+{% block nav_quiz %}active{% endblock %}
+
+{% block content %}
+<section class="result-page">
+    <div class="container">
+        <div class="result-card-main">
+            <div class="result-top">
+                {% if foiz >= 80 %}
+                <div class="result-emoji">&#127942;</div>
+                <h1>{{ s.test_ajoyib_matn }}</h1>
+                {% elif foiz >= 50 %}
+                <div class="result-emoji">&#128077;</div>
+                <h1>{{ s.test_yaxshi_matn }}</h1>
+                {% else %}
+                <div class="result-emoji">&#128218;</div>
+                <h1>{{ s.test_orqaning_matn }}</h1>
+                {% endif %}
+
+                <div class="result-circle {% if foiz >= 80 %}circle-good{% elif foiz >= 50 %}circle-ok{% else %}circle-low{% endif %}">
+                    <span class="circle-num">{{ foiz }}%</span>
+                </div>
+                <p class="result-summary">{{ togri }} / {{ jami }} to'g'ri javob</p>
+            </div>
+        </div>
+
+        <div class="result-details">
+            <h2>{{ s.test_batafsil_matn }}</h2>
+            {% for n in natijalar %}
+            <div class="result-item {% if n.is_correct %}item-correct{% else %}item-wrong{% endif %}">
+                <div class="result-status">
+                    {% if n.is_correct %}
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    {% else %}
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                    {% endif %}
+                </div>
+                <div class="result-info">
+                    <p class="result-question">{{ n.savol.savol }}</p>
+                    {% if not n.is_correct %}
+                    <p class="result-wrong-answer">Sizning javobingiz: <strong>{{ n.javob|upper }}</strong></p>
+                    <p class="result-correct-answer">To'g'ri javob: <strong>{{ n.togri|upper }}</strong></p>
+                    {% endif %}
+                    {% if n.savol.izoh %}
+                    <div class="result-explanation">{{ n.savol.izoh }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="result-actions">
+            <a href="{% url 'loyiha:test' %}" class="btn btn-primary">{{ s.test_qayta_matn }}</a>
+            <a href="{% url 'loyiha:bosh_sahifa' %}" class="btn btn-outline-dark">{{ s.test_bosh_sahifa_matn }}</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

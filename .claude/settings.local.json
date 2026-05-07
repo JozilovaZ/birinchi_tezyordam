@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem \"D:\\\\topshiriqlar\\\\birinchi_tez_yordam\" -Exclude \"venv\")",
+      "Bash(Select-Object Name, PSIsContainer)",
+      "PowerShell(Get-ChildItem \"D:\\\\topshiriqlar\\\\birinchi_tez_yordam\" | Where-Object { $_.Name -ne \"venv\" } | Format-Table Name, PSIsContainer -AutoSize)",
+      "PowerShell(Get-ChildItem \"D:\\\\topshiriqlar\\\\birinchi_tez_yordam\\\\loyiha\" -Recurse | Where-Object { !$_.PSIsContainer } | Select-Object FullName | Format-Table -AutoSize)",
+      "PowerShell(New-Item *)",
+      "PowerShell(cd \"D:\\\\topshiriqlar\\\\birinchi_tez_yordam\"; $env:DEBUG=\"False\"; $env:ALLOWED_HOSTS=\"localhost\"; .\\\\venv\\\\Scripts\\\\python.exe manage.py collectstatic --noinput 2>&1)"
+    ]
+  }
+}

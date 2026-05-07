@@ -1,0 +1,201 @@
+{% extends 'loyiha/base.html' %}
+{% load static %}
+
+{% block title %}{{ s.dorilar_sarlavha }} - {{ s.sayt_nomi }}{% endblock %}
+{% block nav_dorilar %}active{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="dorilar-header">
+    <div class="container">
+        <div class="dorilar-header-top">
+            <div>
+                <h1 class="dorilar-title">{{ s.dorilar_sarlavha }}</h1>
+                <p class="dorilar-subtitle">{{ s.dorilar_tavsif }}</p>
+            </div>
+            <button class="btn btn-success dori-qoshish-btn" onclick="document.getElementById('doriModal').classList.add('active')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                {{ s.dori_qoshish_matn }}
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<section class="dorilar-section">
+    <div class="container">
+        <div class="dorilar-layout">
+            <!-- Left: Medicine Grid -->
+            <div class="dorilar-main">
+                <div class="dorilar-main-header">
+                    <h2 class="dorilar-section-title">{{ s.mavjud_dorilar_matn }}</h2>
+                    <span class="dorilar-count">jami: {{ dorilar.count }} ta</span>
+                </div>
+                <div class="dorilar-grid">
+                    {% for dori in dorilar %}
+                    <div class="dori-card">
+                        <div class="dori-card-img">
+                            {% if dori.rasm %}
+                            <img src="{{ dori.rasm.url }}" alt="{{ dori.nomi }}">
+                            {% else %}
+                            <div class="dori-card-placeholder">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="dori-card-body">
+                            <h3 class="dori-card-name">{{ dori.nomi }}</h3>
+                            <span class="dori-card-dose">{{ dori.miqdor }}</span>
+                            {% if dori.muddati %}
+                            <span class="dori-card-date">{{ dori.muddati|date:"d.m.Y" }}</span>
+                            {% endif %}
+                        </div>
+                        <form method="post" action="{% url 'loyiha:dori_ochirish' dori.pk %}" class="dori-card-delete">
+                            {% csrf_token %}
+                            <button type="submit" class="dori-delete-btn" title="O'chirish">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                            </button>
+                        </form>
+                    </div>
+                    {% empty %}
+                    <div class="dorilar-empty">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.5"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"/><path d="M12 8v8M8 12h8"/></svg>
+                        <p>Hozircha dorilar qo'shilmagan</p>
+                        <button class="btn btn-success btn-sm" onclick="document.getElementById('doriModal').classList.add('active')">Dori qo'shish</button>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Right: Sidebar -->
+            <div class="dorilar-sidebar">
+                <!-- Expiration Warning -->
+                <div class="dorilar-sidebar-card dorilar-xavf-card">
+                    <div class="sidebar-card-header">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+                        <h3>{{ s.muddati_xavf_matn }}</h3>
+                    </div>
+                    {% for dori in xavfli_dorilar %}
+                    <div class="xavf-item">
+                        <span class="xavf-name">{{ dori.nomi }}</span>
+                        <span class="xavf-date">{{ dori.muddati|date:"d.m.Y" }} gacha</span>
+                    </div>
+                    {% empty %}
+                    <p class="sidebar-empty">Xavfli dorilar yo'q</p>
+                    {% endfor %}
+                </div>
+
+                <!-- Reminders -->
+                <div class="dorilar-sidebar-card dorilar-eslatma-card">
+                    <div class="sidebar-card-header">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                        <h3>{{ s.eslatmalar_matn }}</h3>
+                    </div>
+                    {% for dori in eslatmalar %}
+                    <div class="eslatma-item">
+                        <div class="eslatma-time-badge">{{ dori.eslatma_vaqti|time:"H:i" }}</div>
+                        <div class="eslatma-info">
+                            <span class="eslatma-title">{{ dori.eslatma_tavsif|default:"Dori ichish vaqti" }}</span>
+                            <span class="eslatma-dori">{{ dori.nomi }} {{ dori.miqdor }}</span>
+                            {% if dori.eslatma_qolgan_kun != None %}
+                            <span class="eslatma-dori" style="color: {% if dori.eslatma_faol %}var(--success){% else %}var(--primary){% endif %}">
+                                {% if dori.eslatma_faol %}{{ dori.eslatma_qolgan_kun }} kun qoldi{% else %}Tugagan{% endif %}
+                            </span>
+                            {% elif dori.eslatma_faol %}
+                            <span class="eslatma-dori" style="color: var(--success)">Doimiy</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="sidebar-empty">Eslatmalar yo'q</p>
+                    {% endfor %}
+                </div>
+
+                <!-- Telegram Bot -->
+                <div class="dorilar-sidebar-card dorilar-telegram-card">
+                    <div class="sidebar-card-header">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0088cc" stroke-width="2"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></svg>
+                        <h3>Telegram eslatma</h3>
+                    </div>
+                    {% if telegram_ulangan %}
+                        <p class="maslahat-text" style="margin-bottom: 12px; color: #10b981;">
+                            ✅ Telegram akkountingiz bog'langan. Eslatmalar avtomatik keladi.
+                        </p>
+                    {% else %}
+                        <p class="maslahat-text" style="margin-bottom: 12px;">
+                            Eslatmalar kelishi uchun Telegramni ulang.
+                        </p>
+                        <a href="{{ ulanish_linki }}" target="_blank" class="btn btn-primary btn-sm btn-block">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></svg>
+                            Telegramni ulash
+                        </a>
+                    {% endif %}
+                </div>
+
+                <!-- Useful Tip -->
+                <div class="dorilar-sidebar-card dorilar-maslahat-card">
+                    <div class="sidebar-card-header">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"/><path d="M9 21h6M10 17v1M14 17v1"/></svg>
+                        <h3>{{ s.foydali_maslahat_matn }}</h3>
+                    </div>
+                    <p class="maslahat-text">{{ s.dorilar_maslahat }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Add Medicine Modal -->
+<div class="dori-modal" id="doriModal">
+    <div class="dori-modal-overlay" onclick="document.getElementById('doriModal').classList.remove('active')"></div>
+    <div class="dori-modal-content">
+        <div class="dori-modal-header">
+            <h2>{{ s.dori_qoshish_matn }}</h2>
+            <button class="dori-modal-close" onclick="document.getElementById('doriModal').classList.remove('active')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <form method="post" action="{% url 'loyiha:dori_qoshish' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="dori-form-grid">
+                <div class="dori-form-group">
+                    <label>Dori nomi *</label>
+                    <input type="text" name="nomi" required placeholder="Masalan: Paratsetamol">
+                </div>
+                <div class="dori-form-group">
+                    <label>Miqdori</label>
+                    <input type="text" name="miqdor" placeholder="Masalan: 500mg">
+                </div>
+                <div class="dori-form-group full-width">
+                    <label>Tavsif</label>
+                    <textarea name="tavsif" rows="2" placeholder="Qo'shimcha ma'lumot..."></textarea>
+                </div>
+                <div class="dori-form-group">
+                    <label>Yaroqlilik muddati</label>
+                    <input type="date" name="muddati">
+                </div>
+                <div class="dori-form-group">
+                    <label>Eslatma vaqti</label>
+                    <input type="time" name="eslatma_vaqti">
+                </div>
+                <div class="dori-form-group">
+                    <label>Necha kun eslatsin</label>
+                    <input type="number" name="eslatma_kunlar" min="1" max="365" placeholder="Masalan: 30">
+                </div>
+                <div class="dori-form-group full-width">
+                    <label>Eslatma matni</label>
+                    <input type="text" name="eslatma_tavsif" placeholder="Masalan: Ovqatdan keyin ichish">
+                </div>
+                <div class="dori-form-group full-width">
+                    <label>Rasm</label>
+                    <input type="file" name="rasm" accept="image/*">
+                </div>
+            </div>
+            <div class="dori-form-actions">
+                <button type="button" class="btn btn-outline-dark" onclick="document.getElementById('doriModal').classList.remove('active')">Bekor qilish</button>
+                <button type="submit" class="btn btn-success">Saqlash</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

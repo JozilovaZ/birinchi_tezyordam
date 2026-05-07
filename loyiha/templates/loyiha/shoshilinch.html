@@ -1,0 +1,131 @@
+{% extends 'loyiha/base.html' %}
+{% load static %}
+
+{% block title %}{{ s.shoshilinch_sarlavha }} - {{ s.sayt_nomi }}{% endblock %}
+
+{% block content %}
+<section class="emergency-page">
+    <div class="container">
+        <div class="emergency-hero">
+            <div class="emergency-pulse-ring"></div>
+            <div class="emergency-icon-big">{{ s.logo_matn }}</div>
+            <h1>{{ s.shoshilinch_sarlavha }}</h1>
+            <p>{{ s.shoshilinch_tavsif }}</p>
+        </div>
+
+        <!-- Dynamic Steps -->
+        <div class="emergency-steps">
+            {% for qadam in qadamlar %}
+            <div class="e-step-card {% if qadam.muhim %}e-step-highlight{% endif %}">
+                <div class="e-step-num">{{ qadam.tartib }}</div>
+                <div class="e-step-body">
+                    <h2>{{ qadam.sarlavha }}</h2>
+                    <p>{{ qadam.tavsif }}</p>
+                    {% if qadam.qongiroq_tugmasi and asosiy_raqam %}
+                    <a href="tel:{{ asosiy_raqam.raqam }}" class="btn btn-emergency-full" style="margin-top:12px">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        {{ asosiy_raqam.raqam }} {{ s.qongiroq_matn }}
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <!-- Fallback if no steps in DB -->
+            <div class="e-step-card">
+                <div class="e-step-num">1</div>
+                <div class="e-step-body">
+                    <h2>Xavfsizlikni ta'minlang</h2>
+                    <p>O'zingiz va jabrlanuvchining xavfsizligiga ishonch hosil qiling.</p>
+                </div>
+            </div>
+            <div class="e-step-card e-step-highlight">
+                <div class="e-step-num">2</div>
+                <div class="e-step-body">
+                    <h2>{% if asosiy_raqam %}{{ asosiy_raqam.raqam }}{% else %}103{% endif %} ga qo'ng'iroq qiling</h2>
+                    <p>Tez yordam xizmatiga qo'ng'iroq qiling.</p>
+                    {% if asosiy_raqam %}
+                    <a href="tel:{{ asosiy_raqam.raqam }}" class="btn btn-emergency-full" style="margin-top:12px">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        {{ asosiy_raqam.raqam }} {{ s.qongiroq_matn }}
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="e-step-card">
+                <div class="e-step-num">3</div>
+                <div class="e-step-body">
+                    <h2>Birinchi yordam ko'rsating</h2>
+                    <p>Quyidagi holatni tanlang va bosqichma-bosqich yo'riqnomani bajaring:</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Quick Categories -->
+        <div class="emergency-cats">
+            {% for kat in kategoriyalar %}
+            <a href="{% url 'loyiha:kategoriya_batafsil' kat.pk %}" class="ecat-card">
+                <span class="ecat-icon">{{ kat.icon }}</span>
+                <span class="ecat-name">{{ kat.nomi }}</span>
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- Emergency Numbers -->
+        <div class="emergency-numbers-section">
+            <h2>{{ s.favqulodda_raqamlar_matn }}</h2>
+            <div class="emergency-grid">
+                {% for raqam in raqamlar %}
+                <a href="tel:{{ raqam.raqam }}" class="em-card em-card-bordered">
+                    <span class="em-icon">{{ raqam.icon }}</span>
+                    <div class="em-info">
+                        <span class="em-name">{{ raqam.nomi }}</span>
+                        <span class="em-number">{{ raqam.raqam }}</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Location -->
+        <div class="emergency-location">
+            <h2>{{ s.yaqin_kasalxona_matn }}</h2>
+            <button class="btn btn-primary" id="btnLocation" onclick="lokatsiyaniTop()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                {{ s.joylashuv_matn }}
+            </button>
+            <div id="locationResult" class="location-result"></div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function lokatsiyaniTop() {
+    const result = document.getElementById('locationResult');
+    if (!navigator.geolocation) {
+        result.innerHTML = '<p class="text-red">Brauzeringiz joylashuvni qo\'llab-quvvatlamaydi</p>';
+        return;
+    }
+    result.innerHTML = '<p class="text-muted">Joylashuv aniqlanmoqda...</p>';
+    navigator.geolocation.getCurrentPosition(
+        function(pos) {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+            result.innerHTML = `
+                <div class="location-links">
+                    <a href="https://www.google.com/maps/search/kasalxona/@${lat},${lon},14z"
+                       target="_blank" class="btn btn-primary btn-sm">{{ s.yaqin_kasalxonalar_btn }}</a>
+                    <a href="https://www.google.com/maps/search/dorixona/@${lat},${lon},14z"
+                       target="_blank" class="btn btn-outline-dark btn-sm">{{ s.yaqin_dorixonalar_btn }}</a>
+                </div>
+            `;
+        },
+        function() {
+            result.innerHTML = '<p class="text-red">Joylashuvni aniqlab bo\'lmadi. Ruxsat bering.</p>';
+        }
+    );
+}
+</script>
+{% endblock %}

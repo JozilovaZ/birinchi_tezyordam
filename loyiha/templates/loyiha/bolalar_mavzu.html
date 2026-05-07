@@ -1,0 +1,624 @@
+{% extends 'loyiha/base.html' %}
+{% load static %}
+
+{% block title %}{{ mavzu.sarlavha }} - {{ s.bolalar_sarlavha }} - {{ s.sayt_nomi }}{% endblock %}
+{% block nav_bolalar %}active{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ===== BREADCRUMB ===== */
+.bm-breadcrumb {
+    background: #fff;
+    border-bottom: 1px solid var(--gray-200);
+    padding: 12px 0;
+}
+.bm-breadcrumb nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    color: var(--gray-400);
+    flex-wrap: wrap;
+}
+.bm-breadcrumb a {
+    color: var(--gray-500);
+    text-decoration: none;
+    transition: color .15s;
+}
+.bm-breadcrumb a:hover { color: var(--primary); }
+.bm-breadcrumb span { color: var(--gray-800); font-weight: 600; }
+
+/* ===== HERO ===== */
+.bm-hero {
+    background: linear-gradient(135deg, #fff5f5 0%, #fff 60%);
+    border-bottom: 1px solid var(--gray-200);
+    padding: 40px 0 36px;
+}
+.bm-hero-inner {
+    display: flex;
+    gap: 28px;
+    align-items: center;
+}
+.bm-hero-icon-wrap {
+    flex-shrink: 0;
+    width: 100px;
+    height: 100px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+    border: 2px solid #fecaca;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.2rem;
+    box-shadow: 0 8px 24px rgba(220,38,38,.12);
+}
+.bm-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    background: #fef2f2;
+    color: var(--primary);
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 10px;
+}
+.bm-hero-title {
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--gray-900);
+    line-height: 1.2;
+    margin-bottom: 10px;
+}
+.bm-hero-desc {
+    font-size: 0.95rem;
+    color: var(--gray-500);
+    line-height: 1.75;
+    max-width: 560px;
+    margin-bottom: 14px;
+}
+.bm-hero-chips {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.bm-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+.bm-chip-steps {
+    background: #eff6ff;
+    color: var(--secondary);
+    border: 1px solid #bfdbfe;
+}
+.bm-chip-safe {
+    background: #f0fdf4;
+    color: #16a34a;
+    border: 1px solid #bbf7d0;
+}
+
+/* ===== LAYOUT ===== */
+.bm-content {
+    padding: 40px 0 80px;
+    background: var(--gray-50);
+}
+.bm-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 28px;
+    align-items: flex-start;
+}
+
+/* ===== STEPS SECTION ===== */
+.bm-main {}
+.bm-section-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.bm-section-label-line {
+    flex: 1;
+    height: 1px;
+    background: var(--gray-200);
+}
+.bm-section-label-text {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: var(--gray-400);
+    white-space: nowrap;
+}
+
+/* Timeline style steps */
+.bm-timeline {
+    position: relative;
+    margin-bottom: 28px;
+}
+.bm-timeline::before {
+    content: '';
+    position: absolute;
+    left: 19px;
+    top: 20px;
+    bottom: 20px;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--primary), #fca5a5);
+    border-radius: 2px;
+}
+.bm-tl-item {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    position: relative;
+}
+.bm-tl-item:last-child { margin-bottom: 0; }
+
+.bm-tl-num {
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    font-weight: 800;
+    box-shadow: 0 0 0 4px #fef2f2, 0 0 0 5px #fecaca;
+    transition: transform .2s;
+}
+.bm-tl-item:hover .bm-tl-num {
+    transform: scale(1.1);
+}
+.bm-tl-num-last {
+    background: linear-gradient(135deg, var(--primary), #b91c1c);
+}
+
+.bm-tl-card {
+    flex: 1;
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: 14px;
+    padding: 18px 20px;
+    transition: box-shadow .2s, border-color .2s, transform .2s;
+    cursor: default;
+}
+.bm-tl-card:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,.08);
+    border-color: #fca5a5;
+    transform: translateX(4px);
+}
+.bm-tl-card-first {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, #fff5f5, #fff);
+    box-shadow: 0 2px 12px rgba(220,38,38,.08);
+}
+.bm-tl-card-first:hover {
+    box-shadow: 0 6px 24px rgba(220,38,38,.14);
+}
+.bm-tl-step-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    color: var(--primary);
+    margin-bottom: 4px;
+    display: block;
+}
+.bm-tl-text {
+    font-size: 0.95rem;
+    color: var(--gray-700);
+    line-height: 1.7;
+    margin: 0;
+}
+
+/* ===== EMERGENCY BANNER ===== */
+.bm-emergency {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 22px 28px;
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    border-radius: 16px;
+    color: #fff;
+    box-shadow: 0 8px 32px rgba(220,38,38,.25);
+    margin-top: 8px;
+}
+.bm-em-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+}
+.bm-em-icon-wrap {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: rgba(255,255,255,.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    flex-shrink: 0;
+}
+.bm-em-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+.bm-em-sub {
+    font-size: 0.83rem;
+    opacity: .85;
+}
+.bm-em-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    background: #fff;
+    color: var(--primary);
+    border-radius: 10px;
+    font-size: 1.15rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-decoration: none;
+    transition: background .15s, transform .15s;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+.bm-em-btn:hover {
+    background: #fef2f2;
+    transform: scale(1.03);
+}
+
+/* ===== SIDEBAR ===== */
+.bm-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: sticky;
+    top: 80px;
+}
+
+/* Warning */
+.bm-sw {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-left: 4px solid #f59e0b;
+    border-radius: 14px;
+    padding: 20px;
+}
+.bm-sw-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+.bm-sw-head h3 {
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: #92400e;
+}
+.bm-sw ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.bm-sw li {
+    font-size: 0.83rem;
+    color: #78350f;
+    padding-left: 18px;
+    position: relative;
+    line-height: 1.55;
+}
+.bm-sw li::before {
+    content: '!';
+    position: absolute;
+    left: 0;
+    top: -1px;
+    font-size: 0.75rem;
+    font-weight: 900;
+    color: #f59e0b;
+}
+
+/* Numbers */
+.bm-sn {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: 14px;
+    overflow: hidden;
+}
+.bm-sn-head {
+    padding: 14px 18px 0;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--gray-400);
+    margin-bottom: 4px;
+}
+.bm-sn-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 18px;
+    text-decoration: none;
+    border-bottom: 1px solid var(--gray-100);
+    transition: background .15s;
+}
+.bm-sn-item:last-child { border-bottom: none; }
+.bm-sn-item:hover { background: #fef2f2; }
+.bm-sn-emoji { font-size: 1.3rem; flex-shrink: 0; }
+.bm-sn-name { flex: 1; font-size: 0.85rem; color: var(--gray-600); font-weight: 500; }
+.bm-sn-val {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+/* Others */
+.bm-so {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: 14px;
+    overflow: hidden;
+}
+.bm-so-head {
+    padding: 14px 18px 0;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--gray-400);
+    margin-bottom: 4px;
+}
+.bm-so-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--gray-100);
+    text-decoration: none;
+    color: var(--gray-700);
+    transition: background .15s, color .15s;
+}
+.bm-so-item:last-child { border-bottom: none; }
+.bm-so-item:hover { background: #f9fafb; color: var(--primary); }
+.bm-so-emoji { font-size: 1.2rem; flex-shrink: 0; }
+.bm-so-name { flex: 1; font-size: 0.87rem; font-weight: 500; line-height: 1.35; }
+.bm-so-arrow { color: var(--gray-300); flex-shrink: 0; transition: transform .15s; }
+.bm-so-item:hover .bm-so-arrow { transform: translateX(3px); color: var(--primary); }
+
+/* Back button row */
+.bm-back-row {
+    margin-bottom: 24px;
+}
+.bm-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--gray-500);
+    text-decoration: none;
+    padding: 6px 0;
+    transition: color .15s;
+}
+.bm-back-btn:hover { color: var(--primary); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+    .bm-layout {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+    .bm-sidebar {
+        position: static;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    .bm-sidebar > * {
+        flex: 1;
+        min-width: 240px;
+    }
+}
+
+@media (max-width: 600px) {
+    .bm-hero { padding: 24px 0 20px; }
+    .bm-hero-inner { flex-direction: column; gap: 16px; }
+    .bm-hero-icon-wrap { width: 72px; height: 72px; font-size: 2.4rem; border-radius: 18px; }
+    .bm-hero-title { font-size: 1.5rem; }
+    .bm-hero-desc { font-size: 0.9rem; }
+
+    .bm-content { padding: 24px 0 56px; }
+
+    .bm-timeline::before { left: 15px; }
+    .bm-tl-num { width: 32px; height: 32px; font-size: 0.82rem; box-shadow: 0 0 0 3px #fef2f2, 0 0 0 4px #fecaca; }
+    .bm-tl-card { padding: 14px 16px; border-radius: 10px; }
+    .bm-tl-text { font-size: 0.9rem; }
+
+    .bm-emergency { flex-direction: column; gap: 14px; padding: 18px; text-align: center; border-radius: 12px; }
+    .bm-em-left { flex-direction: column; text-align: center; gap: 10px; }
+    .bm-em-btn { width: 100%; justify-content: center; padding: 14px; font-size: 1.2rem; }
+
+    .bm-sidebar { flex-direction: column; }
+    .bm-sidebar > * { min-width: unset; width: 100%; }
+}
+
+@media (max-width: 400px) {
+    .bm-hero-title { font-size: 1.3rem; }
+    .bm-tl-card { padding: 12px 14px; }
+    .bm-tl-text { font-size: 0.85rem; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb -->
+<div class="bm-breadcrumb">
+    <div class="container">
+        <nav>
+            <a href="{% url 'loyiha:bosh_sahifa' %}">{{ s.nav_home }}</a>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+            <a href="{% url 'loyiha:bolalar' %}">{{ s.bolalar_sarlavha }}</a>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+            <span>{{ mavzu.sarlavha }}</span>
+        </nav>
+    </div>
+</div>
+
+<!-- Hero -->
+<section class="bm-hero">
+    <div class="container">
+        <div class="bm-hero-inner">
+            <div class="bm-hero-icon-wrap">{{ mavzu.icon }}</div>
+            <div class="bm-hero-content">
+                <div class="bm-hero-badge">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    {{ s.bolalar_sarlavha }}
+                </div>
+                <h1 class="bm-hero-title">{{ mavzu.sarlavha }}</h1>
+                <p class="bm-hero-desc">{{ mavzu.tavsif }}</p>
+                <div class="bm-hero-chips">
+                    <span class="bm-chip bm-chip-steps">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                        {{ qadamlar.count }} ta qadam
+                    </span>
+                    <span class="bm-chip bm-chip-safe">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        Tasdiqlangan ma'lumot
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main content -->
+<section class="bm-content">
+    <div class="container">
+        <div class="bm-layout">
+
+            <!-- Steps -->
+            <main class="bm-main">
+                <a href="{% url 'loyiha:bolalar' %}" class="bm-back-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                    Bolalar bo'limiga qaytish
+                </a>
+
+                <div class="bm-section-label">
+                    <span class="bm-section-label-text">Qadamlar — ketma-ket bajaring</span>
+                    <div class="bm-section-label-line"></div>
+                </div>
+
+                {% if qadamlar %}
+                <div class="bm-timeline">
+                    {% for qadam in qadamlar %}
+                    <div class="bm-tl-item">
+                        <div class="bm-tl-num {% if forloop.last %}bm-tl-num-last{% endif %}">
+                            {{ qadam.tartib }}
+                        </div>
+                        <div class="bm-tl-card {% if forloop.first %}bm-tl-card-first{% endif %}">
+                            <span class="bm-tl-step-label">{{ forloop.counter }}-qadam</span>
+                            <p class="bm-tl-text">{{ qadam.matn }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <p>Hozircha qadamlar qo'shilmagan.</p>
+                </div>
+                {% endif %}
+
+                <!-- Emergency -->
+                <div class="bm-emergency">
+                    <div class="bm-em-left">
+                        <div class="bm-em-icon-wrap">🚑</div>
+                        <div>
+                            <div class="bm-em-title">Shoshilinch holat bo'lsa darhol qo'ng'iroq qiling</div>
+                            <div class="bm-em-sub">Vaziyat jiddiy bo'lsa, bu qadamlar bilan birga 103 ga murojaat qiling</div>
+                        </div>
+                    </div>
+                    <a href="tel:103" class="bm-em-btn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13 19.79 19.79 0 0 1 1.61 4.4 2 2 0 0 1 3.6 2.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.16 6.16l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        103
+                    </a>
+                </div>
+            </main>
+
+            <!-- Sidebar -->
+            <aside class="bm-sidebar">
+
+                <!-- Warning -->
+                <div class="bm-sw">
+                    <div class="bm-sw-head">
+                        <span style="font-size:1.2rem">⚠️</span>
+                        <h3>Muhim eslatma</h3>
+                    </div>
+                    <ul>
+                        <li>Bu qadamlar faqat birinchi yordam uchun</li>
+                        <li>Jiddiy holatda darhol 103 ga qo'ng'iroq qiling</li>
+                        <li>Imkon qadar tezroq shifokorga murojaat qiling</li>
+                    </ul>
+                </div>
+
+                <!-- Quick numbers -->
+                <div class="bm-sn">
+                    <div class="bm-sn-head">Tez raqamlar</div>
+                    <a href="tel:103" class="bm-sn-item">
+                        <span class="bm-sn-emoji">🚑</span>
+                        <span class="bm-sn-name">Tez yordam</span>
+                        <span class="bm-sn-val">103</span>
+                    </a>
+                    <a href="tel:101" class="bm-sn-item">
+                        <span class="bm-sn-emoji">🚒</span>
+                        <span class="bm-sn-name">O't o'chirish</span>
+                        <span class="bm-sn-val">101</span>
+                    </a>
+                    <a href="tel:102" class="bm-sn-item">
+                        <span class="bm-sn-emoji">👮</span>
+                        <span class="bm-sn-name">Militsiya</span>
+                        <span class="bm-sn-val">102</span>
+                    </a>
+                    <a href="tel:1050" class="bm-sn-item">
+                        <span class="bm-sn-emoji">🆘</span>
+                        <span class="bm-sn-name">Favqulodda</span>
+                        <span class="bm-sn-val">1050</span>
+                    </a>
+                </div>
+
+                <!-- Other topics -->
+                {% if boshqa_mavzular %}
+                <div class="bm-so">
+                    <div class="bm-so-head">Boshqa mavzular</div>
+                    {% for bm in boshqa_mavzular %}
+                    <a href="{% url 'loyiha:bolalar_mavzu' bm.pk %}" class="bm-so-item">
+                        <span class="bm-so-emoji">{{ bm.icon }}</span>
+                        <span class="bm-so-name">{{ bm.sarlavha }}</span>
+                        <svg class="bm-so-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+            </aside>
+        </div>
+    </div>
+</section>
+{% endblock %}

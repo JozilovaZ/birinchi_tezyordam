@@ -1,0 +1,187 @@
+{% extends 'loyiha/base.html' %}
+{% load static %}
+
+{% block title %}{{ s.bolalar_sarlavha }} - {{ s.sayt_nomi }}{% endblock %}
+{% block nav_bolalar %}active{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<section class="bolalar-header">
+    <div class="container">
+        <div class="bolalar-header-layout">
+            <div class="bolalar-header-content">
+                <span class="section-badge red">{{ s.bolalar_badge }}</span>
+                <h1 class="bolalar-page-title">{{ s.bolalar_sarlavha }}</h1>
+                <p class="bolalar-page-subtitle">{{ s.bolalar_tavsif }}</p>
+            </div>
+            <div class="bolalar-header-illustration">
+                <div class="bolalar-illustration-circle">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Topic -->
+{% if tanlangan %}
+<section class="bolalar-featured">
+    <div class="container">
+        <div class="bolalar-featured-layout">
+            <div class="bolalar-featured-main">
+                <div class="bolalar-featured-card">
+                    {% if tanlangan.rasm %}
+                    <div class="bolalar-featured-img">
+                        <img src="{{ tanlangan.rasm.url }}" alt="{{ tanlangan.sarlavha }}">
+                    </div>
+                    {% else %}
+                    <div class="bolalar-featured-img bolalar-featured-placeholder">
+                        <span style="font-size: 4rem;">{{ tanlangan.icon }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="bolalar-featured-body">
+                        <h2 class="bolalar-featured-title">{{ tanlangan.sarlavha }}</h2>
+                        <p class="bolalar-featured-desc">{{ tanlangan.tavsif }}</p>
+                        {% if tanlangan.qadamlar.exists %}
+                        <div class="bolalar-steps">
+                            {% for qadam in tanlangan.qadamlar.all|slice:":3" %}
+                            <div class="bolalar-step">
+                                <span class="bolalar-step-num">{{ qadam.tartib }}</span>
+                                <span class="bolalar-step-text">{{ qadam.matn }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <a href="{% url 'loyiha:bolalar_mavzu' tanlangan.pk %}" class="btn btn-primary" style="margin-top:20px">
+                            Barcha qadamlarni ko'rish
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="bolalar-featured-sidebar">
+                <!-- Tips Card -->
+                <div class="bolalar-sidebar-card bolalar-tips-card">
+                    <div class="bolalar-sidebar-header">
+                        <span class="bolalar-sidebar-icon">&#9888;</span>
+                        <h3>{{ s.bolalar_ogohlantirish_sarlavha }}</h3>
+                    </div>
+                    <ul class="bolalar-tips-list">
+                        {% for ogohlantirish in ogohlantirishlar %}
+                        <li>{{ ogohlantirish.matn }}</li>
+                        {% empty %}
+                        <li>Admin paneldan ogohlantirish qo'shing</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <!-- Quick Info Card -->
+                <div class="bolalar-sidebar-card bolalar-info-card">
+                    <div class="bolalar-sidebar-header">
+                        <span class="bolalar-sidebar-icon">&#128214;</span>
+                        <h3>{{ s.bolalar_maslahat_sarlavha }}</h3>
+                    </div>
+                    <p class="bolalar-info-text">{{ s.bolalar_maslahat }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- All Topics -->
+<section class="bolalar-topics">
+    <div class="container">
+        <div class="section-header">
+            <div>
+                <span class="section-badge">{{ s.barcha_mavzular_matn }}</span>
+                <h2 class="section-title">{{ s.bolalar_sarlavha }}</h2>
+            </div>
+        </div>
+        <div class="bolalar-topics-grid">
+            {% for mavzu in mavzular %}
+            <a href="{% url 'loyiha:bolalar_mavzu' mavzu.pk %}" class="bolalar-topic-card">
+                <div class="bolalar-topic-icon">{{ mavzu.icon }}</div>
+                <div class="bolalar-topic-body">
+                    <h3 class="bolalar-topic-name">{{ mavzu.sarlavha }}</h3>
+                    <p class="bolalar-topic-desc">{{ mavzu.tavsif|truncatewords:15 }}</p>
+                    {% if mavzu.qadamlar.exists %}
+                    <span class="bolalar-topic-steps">{{ mavzu.qadamlar.count }} {{ s.qadam_matn }}</span>
+                    {% endif %}
+                </div>
+                <svg class="bolalar-topic-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </a>
+            {% empty %}
+            <div class="bolalar-empty">
+                <p>Hozircha bolalar mavzulari qo'shilmagan.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Ma'lumotlar bo'limi -->
+{% if malumotlar %}
+<section class="bolalar-malumotlar">
+    <div class="container">
+        <div class="section-header">
+            <div>
+                <span class="section-badge red">Foydali ma'lumotlar</span>
+                <h2 class="section-title">Bilish kerak bo'lgan narsalar</h2>
+            </div>
+        </div>
+        <div class="bolalar-malumot-grid">
+            {% for m in malumotlar %}
+            <div class="bolalar-malumot-card" style="--m-color: {{ m.rang }}">
+                <div class="bolalar-malumot-icon">{{ m.icon }}</div>
+                <div class="bolalar-malumot-body">
+                    <h3>{{ m.sarlavha }}</h3>
+                    <p>{{ m.matn }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Bottom CTA Banner -->
+<section class="bolalar-cta">
+    <div class="container">
+        <div class="bolalar-cta-card">
+            <div class="bolalar-cta-content">
+                <h2>{{ s.bolalar_cta_sarlavha }}</h2>
+                <p>{{ s.bolalar_cta_tavsif }}</p>
+                <a href="{% url 'loyiha:katalog' %}" class="btn btn-white">{{ s.katalogga_matn }} &rarr;</a>
+            </div>
+            <div class="bolalar-cta-illustration">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M12 6v6M9 9h6"/></svg>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.bolalar-malumotlar { padding: 60px 0; background: #f0f9ff; }
+.bolalar-malumot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 32px; }
+.bolalar-malumot-card { background: #fff; border-radius: 14px; padding: 24px; display: flex; gap: 16px; align-items: flex-start; border-left: 4px solid var(--m-color, #3b82f6); box-shadow: 0 2px 8px rgba(0,0,0,.04); transition: transform .2s, box-shadow .2s; }
+.bolalar-malumot-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.08); }
+.bolalar-malumot-icon { font-size: 2rem; flex-shrink: 0; width: 48px; height: 48px; background: #eff6ff; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+.bolalar-malumot-body h3 { font-size: 16px; font-weight: 700; color: #111827; margin: 0 0 6px; }
+.bolalar-malumot-body p { color: #4b5563; font-size: 14px; margin: 0; line-height: 1.6; }
+
+@media (max-width: 768px) {
+    .bolalar-malumotlar { padding: 40px 0; }
+    .bolalar-malumot-grid { grid-template-columns: 1fr; gap: 14px; margin-top: 20px; }
+    .bolalar-malumot-card { padding: 18px 16px; gap: 12px; }
+    .bolalar-malumot-icon { width: 42px; height: 42px; font-size: 1.6rem; }
+}
+
+@media (max-width: 480px) {
+    .bolalar-malumot-card { padding: 14px 12px; }
+    .bolalar-malumot-body h3 { font-size: 14px; }
+    .bolalar-malumot-body p { font-size: 13px; }
+}
+</style>
+{% endblock %}

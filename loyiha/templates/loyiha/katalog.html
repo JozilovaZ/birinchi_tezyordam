@@ -1,0 +1,87 @@
+{% extends 'loyiha/base.html' %}
+{% load static %}
+
+{% block title %}{{ s.katalog_sarlavha }} - {{ s.sayt_nomi }}{% endblock %}
+{% block nav_catalog %}active{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<div class="breadcrumb-bar">
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="{% url 'loyiha:bosh_sahifa' %}">{{ s.nav_home }}</a>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+            <span>{{ s.katalog_sarlavha }}</span>
+        </div>
+    </div>
+</div>
+
+<!-- Hero Banner -->
+<section class="catalog-hero">
+    <div class="container">
+        <div class="catalog-hero-card" {% if s.katalog_rasm %}style="background-image: url('{{ s.katalog_rasm.url }}'); background-size: cover; background-position: center;"{% endif %}>
+            <div class="catalog-hero-overlay"></div>
+            <div class="catalog-hero-content">
+                <span class="catalog-badge">{{ s.katalog_badge }}</span>
+                <h1>{{ s.katalog_sarlavha }}</h1>
+                <p>{{ s.katalog_tavsif }}</p>
+                <a href="{% url 'loyiha:shoshilinch' %}" class="btn btn-white">
+                    {{ s.shoshilinch_sarlavha }} &rarr;
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Urgent Medical Protocols -->
+<section class="catalog-section">
+    <div class="container">
+        <div class="catalog-layout">
+            <div class="catalog-main">
+                <h2 class="catalog-title">{{ s.katalog_protokol_sarlavha }}</h2>
+                <p class="catalog-subtitle">{{ s.katalog_protokol_tavsif }}</p>
+                <div class="catalog-grid">
+                    {% for kat in kategoriyalar %}
+                    <a href="{% url 'loyiha:kategoriya_batafsil' kat.pk %}" class="protocol-card">
+                        <div class="protocol-header">
+                            <span class="protocol-icon" style="color: {{ kat.rang }}">{{ kat.icon }}</span>
+                            <span class="protocol-steps-badge">{{ kat.qadamlar.count }} {{ s.qadam_matn }}</span>
+                        </div>
+                        <h3 class="protocol-name">{{ kat.nomi }}</h3>
+                        <p class="protocol-desc">{{ kat.tavsif|truncatewords:15 }}</p>
+                        <div class="protocol-footer">
+                            <span class="protocol-link" style="color: {{ kat.rang }}">{{ s.batafsil_oqish_matn }} &rarr;</span>
+                        </div>
+                    </a>
+                    {% empty %}
+                    <div class="empty-state">
+                        <p>Hozircha protokollar qo'shilmagan.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="catalog-sidebar">
+                <div class="sidebar-card">
+                    <h3 class="sidebar-title">{{ s.favqulodda_raqamlar_matn }}</h3>
+                    <div class="sidebar-numbers">
+                        {% for raqam in raqamlar %}
+                        <div class="sidebar-num-item">
+                            <span class="sidebar-num-icon">{{ raqam.icon }}</span>
+                            <div>
+                                <div class="sidebar-num-name">{{ raqam.nomi }}</div>
+                                <div class="sidebar-num-value">{{ raqam.raqam }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="sidebar-card sidebar-test">
+                    <h3 class="sidebar-title">{{ s.promo_badge }}</h3>
+                    <p>{{ s.promo_tavsif }}</p>
+                    <a href="{% url 'loyiha:test' %}" class="btn btn-primary btn-block">{{ s.promo_tugma_matn }}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends 'loyiha/base.html' %}
+
+{% block title %}Kirish - {{ s.sayt_nomi }}{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-wrap">
+        <div class="auth-card">
+            <div class="auth-head">
+                <div class="auth-icon">+</div>
+                <h1>Kirish</h1>
+                <p>Shaxsiy dorixonangizga kirish uchun ma'lumotlaringizni kiriting</p>
+            </div>
+
+            <form method="post" class="auth-form" novalidate>
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <div class="auth-error">{{ form.non_field_errors|join:" " }}</div>
+                {% endif %}
+
+                <label class="auth-label">Foydalanuvchi nomi</label>
+                {{ form.username }}
+                {% if form.username.errors %}<div class="auth-error">{{ form.username.errors|join:" " }}</div>{% endif %}
+
+                <label class="auth-label">Parol</label>
+                {{ form.password }}
+                {% if form.password.errors %}<div class="auth-error">{{ form.password.errors|join:" " }}</div>{% endif %}
+
+                <button type="submit" class="auth-btn">Kirish</button>
+            </form>
+
+            <div class="auth-foot">
+                Hali akkountingiz yo'qmi?
+                <a href="{% url 'loyiha:royxatdan_otish' %}">Ro'yxatdan o'ting</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.auth-section { padding: 60px 20px; min-height: calc(100vh - 80px); display: flex; align-items: center; background: linear-gradient(135deg, #fef2f2 0%, #fff 100%); }
+.auth-wrap { max-width: 440px; margin: 0 auto; width: 100%; }
+.auth-card { background: #fff; border-radius: 16px; padding: 40px 36px; box-shadow: 0 10px 40px rgba(220,38,38,.08); border: 1px solid #f3f4f6; }
+.auth-head { text-align: center; margin-bottom: 28px; }
+.auth-icon { width: 56px; height: 56px; border-radius: 50%; background: #dc2626; color: #fff; font-size: 32px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+.auth-head h1 { font-size: 28px; font-weight: 800; color: #111827; margin: 0 0 6px; }
+.auth-head p { color: #6b7280; font-size: 14px; margin: 0; }
+.auth-form { display: flex; flex-direction: column; gap: 4px; }
+.auth-label { font-size: 13px; font-weight: 600; color: #374151; margin-top: 12px; margin-bottom: 6px; }
+.form-input { width: 100%; padding: 12px 14px; border: 1.5px solid #e5e7eb; border-radius: 10px; font-size: 15px; transition: border-color .15s; outline: none; box-sizing: border-box; font-family: inherit; }
+.form-input:focus { border-color: #dc2626; }
+.auth-btn { margin-top: 20px; padding: 13px; background: #dc2626; color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background .15s; }
+.auth-btn:hover { background: #b91c1c; }
+.auth-foot { text-align: center; margin-top: 22px; padding-top: 20px; border-top: 1px solid #f3f4f6; font-size: 14px; color: #6b7280; }
+.auth-foot a { color: #dc2626; font-weight: 600; text-decoration: none; margin-left: 4px; }
+.auth-foot a:hover { text-decoration: underline; }
+.auth-error { background: #fef2f2; color: #b91c1c; padding: 10px 12px; border-radius: 8px; font-size: 13px; margin: 6px 0; border-left: 3px solid #dc2626; }
+</style>
+{% endblock %}

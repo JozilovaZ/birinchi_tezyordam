@@ -1,0 +1,119 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ s.sayt_nomi }}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'loyiha/css/style.css' %}">
+    <link rel="manifest" href="{% static 'loyiha/manifest.json' %}">
+    <meta name="theme-color" content="#dc2626">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+    <style>
+        .nav-user { display: flex; align-items: center; gap: 8px; }
+        .nav-user-name { font-size: 13px; font-weight: 600; color: #374151; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .nav-auth-btn { display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; text-decoration: none; background: #dc2626; color: #fff; transition: background .15s; white-space: nowrap; }
+        .nav-auth-btn:hover { background: #b91c1c; }
+        .nav-auth-btn-ghost { background: transparent; color: #374151; border: 1.5px solid #e5e7eb; padding: 5px 10px; }
+        .nav-auth-btn-ghost:hover { background: #f9fafb; color: #dc2626; border-color: #dc2626; }
+        .nav-menu-auth { display: none; }
+        @media (max-width: 1200px) {
+            .nav-auth-btn { padding: 6px 10px; font-size: 0.75rem; }
+            .nav-user-name { display: none; }
+        }
+        @media (max-width: 1024px) {
+            .nav-actions .nav-auth-btn { display: none; }
+            .nav-menu-auth { display: block; border-top: 1px solid #f3f4f6; margin-top: 8px; padding-top: 8px; }
+            .nav-menu-auth a { color: #dc2626 !important; font-weight: 600 !important; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigatsiya -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{% url 'loyiha:bosh_sahifa' %}" class="nav-logo">
+                <span class="logo-icon">{{ s.logo_matn }}</span>
+                <span class="logo-text">{{ s.sayt_nomi }}</span>
+            </a>
+            <button class="nav-toggle" id="navToggle" aria-label="Menyu">
+                <span></span><span></span><span></span>
+            </button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="{% url 'loyiha:bosh_sahifa' %}" class="{% block nav_home %}{% endblock %}">{{ s.nav_home }}</a></li>
+                <li><a href="{% url 'loyiha:katalog' %}" class="{% block nav_catalog %}{% endblock %}">{{ s.nav_catalog }}</a></li>
+                <li><a href="{% url 'loyiha:dorilar' %}" class="{% block nav_dorilar %}{% endblock %}">{{ s.dorilar_sarlavha }}</a></li>
+                <li><a href="{% url 'loyiha:videolar' %}" class="{% block nav_videolar %}{% endblock %}">{{ s.video_sarlavha }}</a></li>
+                <li><a href="{% url 'loyiha:bolalar' %}" class="{% block nav_bolalar %}{% endblock %}">{{ s.bolalar_sarlavha }}</a></li>
+                <li><a href="{% url 'loyiha:test' %}" class="{% block nav_quiz %}{% endblock %}">{{ s.nav_quiz }}</a></li>
+
+                {% if user.is_authenticated %}
+                    <li class="nav-menu-auth"><a href="{% url 'loyiha:chiqish' %}">Chiqish ({{ user.first_name|default:user.username }})</a></li>
+                {% else %}
+                    <li class="nav-menu-auth"><a href="{% url 'loyiha:kirish' %}">Kirish</a></li>
+                    <li class="nav-menu-auth"><a href="{% url 'loyiha:royxatdan_otish' %}">Ro'yxatdan o'tish</a></li>
+                {% endif %}
+            </ul>
+            <div class="nav-actions">
+                <button class="nav-icon-btn" onclick="document.getElementById('searchModal').classList.add('active')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                </button>
+                {% if user.is_authenticated %}
+                    <div class="nav-user">
+                        <span class="nav-user-name">{{ user.first_name|default:user.username }}</span>
+                        <a href="{% url 'loyiha:chiqish' %}" class="nav-auth-btn nav-auth-btn-ghost">Chiqish</a>
+                    </div>
+                {% else %}
+                    <a href="{% url 'loyiha:kirish' %}" class="nav-auth-btn nav-auth-btn-ghost">Kirish</a>
+                    <a href="{% url 'loyiha:royxatdan_otish' %}" class="nav-auth-btn">Ro'yxatdan o'tish</a>
+                {% endif %}
+                <a href="{% url 'loyiha:shoshilinch' %}" class="btn-emergency-nav">{{ s.nav_emergency }}</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Search Modal -->
+    <div class="search-modal" id="searchModal">
+        <div class="search-modal-overlay" onclick="document.getElementById('searchModal').classList.remove('active')"></div>
+        <div class="search-modal-content">
+            <form action="{% url 'loyiha:qidiruv' %}" method="get" class="search-modal-form">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" name="q" placeholder="{{ s.qidiruv_placeholder }}" autofocus>
+                <button type="button" class="search-close" onclick="document.getElementById('searchModal').classList.remove('active')">ESC</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Asosiy kontent -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <span class="logo-icon">{{ s.logo_matn }}</span>
+                        <span>{{ s.sayt_nomi }}</span>
+                    </div>
+                    <p>&copy; {% now "Y" %} {{ s.footer_matn }}</p>
+                </div>
+                <div class="footer-links">
+                    <a href="#">{{ s.footer_havola1 }}</a>
+                    <a href="#">{{ s.footer_havola2 }}</a>
+                    <a href="#">{{ s.footer_havola3 }}</a>
+                    <a href="#">{{ s.footer_havola4 }}</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{% static 'loyiha/js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

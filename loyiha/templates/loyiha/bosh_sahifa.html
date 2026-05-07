@@ -1,0 +1,197 @@
+{% extends 'loyiha/base.html' %}
+{% load static %}
+
+{% block title %}{{ s.sayt_nomi }} - {{ s.hero_sarlavha|truncatewords:5 }}{% endblock %}
+{% block nav_home %}active{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-new">
+    <div class="container">
+        <div class="hero-new-layout">
+            <div class="hero-new-content">
+                <h1>{{ s.hero_sarlavha }}</h1>
+                <p class="hero-new-subtitle">{{ s.hero_tavsif }}</p>
+                <div class="hero-new-buttons">
+                    <a href="{% url 'loyiha:simulyatsiya' %}" class="btn btn-red">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        {{ s.hero_tugma1_matn }}
+                    </a>
+                    <a href="{% url 'loyiha:katalog' %}" class="btn btn-outline-dark">
+                        {{ s.hero_tugma2_matn }}
+                    </a>
+                </div>
+            </div>
+            <div class="hero-new-image-wrapper">
+                <img src="{{ s.hero_rasm_src }}" alt="{{ s.hero_sarlavha }}" class="hero-new-image">
+                <div class="hero-new-stat-card">
+                    <div class="hero-new-stat-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    </div>
+                    <div>
+                        <div class="hero-new-stat-title">{{ s.hero_stat_sarlavha }}</div>
+                        <div class="hero-new-stat-desc">{{ kategoriyalar.count }}+ {{ s.hero_stat_tavsif }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Red divider -->
+<div class="red-divider">
+    <div class="container">
+        <div class="divider-content">
+            <div class="divider-item">
+                <span class="divider-num">{{ s.divider_1_raqam }}</span>
+                <span>{{ s.divider_1_matn }}</span>
+            </div>
+            <div class="divider-item">
+                <span class="divider-num">{{ s.divider_2_raqam }}</span>
+                <span>{{ s.divider_2_matn }}</span>
+            </div>
+            <div class="divider-item">
+                <span class="divider-num">{{ s.divider_3_raqam }}</span>
+                <span>{{ s.divider_3_matn }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Categories Preview -->
+<section class="section-categories">
+    <div class="container">
+        <div class="section-header">
+            <div>
+                <span class="section-badge">{{ s.kategoriya_badge }}</span>
+                <h2 class="section-title">{{ s.kategoriya_sarlavha }}</h2>
+            </div>
+            <a href="{% url 'loyiha:katalog' %}" class="link-arrow">
+                {{ s.barchasi_matn }}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+        </div>
+        <div class="categories-grid">
+            {% for kat in kategoriyalar %}
+            <a href="{% url 'loyiha:kategoriya_batafsil' kat.pk %}" class="cat-card">
+                <div class="cat-card-top" style="border-top: 3px solid {{ kat.rang }}">
+                    <span class="cat-icon">{{ kat.icon }}</span>
+                    <span class="cat-steps">{{ kat.qadamlar.count }} {{ s.qadam_matn }}</span>
+                </div>
+                <h3 class="cat-name">{{ kat.nomi }}</h3>
+                <p class="cat-desc">{{ kat.tavsif|truncatewords:12 }}</p>
+                <span class="cat-link">{{ s.batafsil_matn }} &rarr;</span>
+            </a>
+            {% empty %}
+            <div class="empty-state">
+                <p>Hozircha kategoriyalar qo'shilmagan.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Map Section -->
+<section class="section-map">
+    <div class="container">
+        <div class="map-layout">
+            <div class="map-info">
+                <span class="section-badge">{{ s.xarita_badge }}</span>
+                <h2 class="section-title">{{ s.xarita_sarlavha }}</h2>
+                <p class="map-desc">{{ s.xarita_tavsif }}</p>
+                <button class="btn btn-primary" id="btnLocation" onclick="lokatsiyaniTop()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    {{ s.joylashuv_matn }}
+                </button>
+                <div id="locationResult" class="location-result"></div>
+            </div>
+            <div class="map-visual">
+                <div class="map-placeholder">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <span>{{ s.xarita_placeholder }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Emergency Numbers -->
+<section class="section-emergency">
+    <div class="container">
+        <div class="section-header">
+            <div>
+                <span class="section-badge red">{{ s.muhim_badge }}</span>
+                <h2 class="section-title">{{ s.favqulodda_raqamlar_matn }}</h2>
+            </div>
+        </div>
+        <div class="emergency-grid">
+            {% for raqam in raqamlar %}
+            <a href="tel:{{ raqam.raqam }}" class="em-card">
+                <span class="em-icon">{{ raqam.icon }}</span>
+                <div class="em-info">
+                    <span class="em-name">{{ raqam.nomi }}</span>
+                    <span class="em-number">{{ raqam.raqam }}</span>
+                </div>
+                <span class="em-call">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                </span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Test Promo -->
+<section class="section-promo">
+    <div class="container">
+        <div class="promo-card">
+            <div class="promo-content">
+                <span class="section-badge white">{{ s.promo_badge }}</span>
+                <h2>{{ s.promo_sarlavha }}</h2>
+                <p>{{ s.promo_tavsif }}</p>
+                <a href="{% url 'loyiha:test' %}" class="btn btn-white">{{ s.promo_tugma_matn }} &rarr;</a>
+            </div>
+            <div class="promo-stats">
+                <div class="promo-stat">
+                    <span class="promo-stat-num">{{ s.promo_stat1_raqam }}</span>
+                    <span class="promo-stat-label">{{ s.promo_stat1_label }}</span>
+                </div>
+                <div class="promo-stat">
+                    <span class="promo-stat-num">{{ s.promo_stat2_raqam }}</span>
+                    <span class="promo-stat-label">{{ s.promo_stat2_label }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function lokatsiyaniTop() {
+    const result = document.getElementById('locationResult');
+    if (!navigator.geolocation) {
+        result.innerHTML = '<p class="text-red">Brauzeringiz joylashuvni qo\'llab-quvvatlamaydi</p>';
+        return;
+    }
+    result.innerHTML = '<p class="text-muted">Joylashuv aniqlanmoqda...</p>';
+    navigator.geolocation.getCurrentPosition(
+        function(pos) {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+            result.innerHTML = `
+                <div class="location-links">
+                    <a href="https://www.google.com/maps/search/kasalxona/@${lat},${lon},14z"
+                       target="_blank" class="btn btn-primary btn-sm">{{ s.yaqin_kasalxonalar_btn }}</a>
+                    <a href="https://www.google.com/maps/search/dorixona/@${lat},${lon},14z"
+                       target="_blank" class="btn btn-outline-dark btn-sm">{{ s.yaqin_dorixonalar_btn }}</a>
+                </div>
+            `;
+        },
+        function() {
+            result.innerHTML = '<p class="text-red">Joylashuvni aniqlab bo\'lmadi</p>';
+        }
+    );
+}
+</script>
+{% endblock %}

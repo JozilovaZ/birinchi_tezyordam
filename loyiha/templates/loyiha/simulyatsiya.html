@@ -1,0 +1,132 @@
+{% extends 'loyiha/base.html' %}
+{% load static %}
+
+{% block title %}Simulyatsiya - {{ s.sayt_nomi }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<div class="breadcrumb-bar">
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="{% url 'loyiha:bosh_sahifa' %}">{{ s.nav_home }}</a>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+            <span>Simulyatsiya</span>
+            {% if tanlangan %}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+            <span>{{ tanlangan.nomi }}</span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if not tanlangan %}
+<!-- Kategoriya tanlash -->
+<section class="sim-hero">
+    <div class="container">
+        <div class="sim-hero-content">
+            <span class="section-badge">Video qo'llanmalar</span>
+            <h1>Kasallikni tanlang</h1>
+            <p>Kasallik yoki favqulodda holatni tanlang — uni qanday tuzatish kerakligi haqida video ko'rsatmalar ochiladi.</p>
+        </div>
+    </div>
+</section>
+
+<section class="sim-categories">
+    <div class="container">
+        <div class="sim-grid">
+            {% for kat in kategoriyalar %}
+            <a href="?kategoriya={{ kat.pk }}" class="sim-cat-card" style="--cat-color: {{ kat.rang }}">
+                <div class="sim-cat-icon">{{ kat.icon }}</div>
+                <h3>{{ kat.nomi }}</h3>
+                <p>{{ kat.tavsif|truncatewords:10 }}</p>
+                <div class="sim-cat-footer">
+                    <span class="sim-cat-play">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        Videolarni ko'rish
+                    </span>
+                </div>
+            </a>
+            {% empty %}
+            <div class="empty-state">
+                <p>Hozircha kategoriyalar qo'shilmagan.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% else %}
+<!-- Video ro'yxati -->
+<section class="sim-videos-section">
+    <div class="container">
+        <div class="sim-videos-header">
+            <div class="sim-videos-title">
+                <span class="sim-videos-icon" style="background: {{ tanlangan.rang }}">{{ tanlangan.icon }}</span>
+                <div>
+                    <h1>{{ tanlangan.nomi }}</h1>
+                    <p>Qanday tuzatish kerakligi haqida video qo'llanmalar</p>
+                </div>
+            </div>
+            <a href="{% url 'loyiha:simulyatsiya' %}" class="btn-back">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+                Orqaga
+            </a>
+        </div>
+
+        <div class="sim-videos-grid">
+            {% for video in videolar %}
+            <div class="sim-video-card">
+                <div class="sim-video-player">
+                    {% if video.is_local %}
+                    <video controls preload="metadata" poster="{% if video.rasm %}{{ video.rasm.url }}{% endif %}">
+                        <source src="{{ video.video_fayl.url }}" type="video/mp4">
+                        Brauzeringiz video formatini qo'llab-quvvatlamaydi.
+                    </video>
+                    {% else %}
+                    <iframe
+                        src="https://www.youtube.com/embed/{{ video.youtube_id }}"
+                        title="{{ video.sarlavha }}"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen>
+                    </iframe>
+                    {% endif %}
+                </div>
+                <div class="sim-video-body">
+                    <h3>{{ video.sarlavha }}</h3>
+                    {% if video.tavsif %}<p>{{ video.tavsif }}</p>{% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="sim-videos-empty">
+                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                <p>Bu kategoriya uchun hozircha video qo'shilmagan.</p>
+                <a href="{% url 'loyiha:simulyatsiya' %}" class="btn btn-red btn-sm">Boshqa kategoriya</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<style>
+.sim-videos-section { padding: 40px 0 80px; background: #f9fafb; min-height: 60vh; }
+.sim-videos-header { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-bottom: 32px; flex-wrap: wrap; }
+.sim-videos-title { display: flex; align-items: center; gap: 16px; }
+.sim-videos-icon { width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; color: #fff; flex-shrink: 0; }
+.sim-videos-title h1 { font-size: 28px; font-weight: 800; color: #111827; margin: 0 0 4px; }
+.sim-videos-title p { color: #6b7280; margin: 0; font-size: 14px; }
+.btn-back { display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; background: #fff; color: #374151; border: 1.5px solid #e5e7eb; border-radius: 8px; font-weight: 600; font-size: 14px; text-decoration: none; transition: all .15s; }
+.btn-back:hover { border-color: #dc2626; color: #dc2626; }
+.sim-videos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px; }
+.sim-video-card { background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.04); transition: transform .2s, box-shadow .2s; }
+.sim-video-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.08); }
+.sim-video-player { position: relative; padding-bottom: 56.25%; background: #000; }
+.sim-video-player iframe,
+.sim-video-player video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; object-fit: contain; background: #000; }
+.sim-video-body { padding: 16px 18px 20px; }
+.sim-video-body h3 { font-size: 16px; font-weight: 700; color: #111827; margin: 0 0 6px; line-height: 1.4; }
+.sim-video-body p { color: #6b7280; font-size: 13px; margin: 0; line-height: 1.5; }
+.sim-videos-empty { grid-column: 1/-1; text-align: center; padding: 60px 20px; background: #fff; border-radius: 14px; border: 1.5px dashed #e5e7eb; }
+.sim-videos-empty p { color: #6b7280; margin: 16px 0; font-size: 15px; }
+</style>
+{% endblock %}
