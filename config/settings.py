@@ -80,6 +80,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
 TELEGRAM_BOT_USERNAME = os.environ.get('TELEGRAM_BOT_USERNAME', '')
 
+CSRF_TRUSTED_ORIGINS = [
+    o.strip() for o in
+    os.environ.get('CSRF_TRUSTED_ORIGINS', 'http://localhost:8888').split(',')
+    if o.strip()
+]
+
 # Production security (DEBUG=False bo'lganda ishlaydi)
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
