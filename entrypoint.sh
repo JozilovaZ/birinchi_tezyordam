@@ -1,6 +1,8 @@
 #!/bin/sh
 set -e
 
+mkdir -p /app/data
+
 echo ">>> Migratsiyalar bajarilmoqda..."
 python manage.py migrate --noinput
 
