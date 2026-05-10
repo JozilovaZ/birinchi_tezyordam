@@ -81,8 +81,8 @@ TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
 TELEGRAM_BOT_USERNAME = os.environ.get('TELEGRAM_BOT_USERNAME', '')
 
 CSRF_TRUSTED_ORIGINS = [
-    f'http://{host}' for host in ALLOWED_HOSTS if host not in ('*',)
-] + [
-    f'https://{host}' for host in ALLOWED_HOSTS if host not in ('*',)
+    o.strip() for o in
+    os.environ.get('CSRF_TRUSTED_ORIGINS', 'http://localhost:8888').split(',')
+    if o.strip()
 ]
 
