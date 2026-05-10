@@ -86,8 +86,3 @@ CSRF_TRUSTED_ORIGINS = [
     if o.strip()
 ]
 
-# Production security (DEBUG=False bo'lganda ishlaydi)
-if not DEBUG:
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
