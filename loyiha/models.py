@@ -13,7 +13,7 @@ class SaytSozlamalari(models.Model):
     hero_tavsif = models.TextField(default="Birinchi Tez Yordam — bu favqulodda vaziyatlarda professional birinchi yordam ko'rsatish bo'yicha siz bilishingiz kerak bo'lgan barchani o'rgatadigan platforma. Har bir soniya muhim.", verbose_name="Hero tavsif")
     hero_rasm = models.ImageField(upload_to='sayt/', verbose_name="Hero rasm", blank=True, null=True)
     hero_rasm_url = models.URLField(default="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=700&q=80", verbose_name="Hero rasm URL (agar rasm yuklanmasa)", blank=True)
-    hero_tugma1_matn = models.CharField(max_length=100, default="Simulyatsiyani boshlash", verbose_name="Hero tugma 1 matni")
+    hero_tugma1_matn = models.CharField(max_length=100, default="Video qo'llanmalar", verbose_name="Hero tugma 1 matni")
     hero_tugma2_matn = models.CharField(max_length=100, default="Katalogga o'tish", verbose_name="Hero tugma 2 matni")
     hero_stat_sarlavha = models.CharField(max_length=200, default="Haqiq pandemiya", verbose_name="Hero stat karta sarlavhasi")
     hero_stat_tavsif = models.CharField(max_length=200, default="protokol tayyor", verbose_name="Hero stat karta tavsifi")
