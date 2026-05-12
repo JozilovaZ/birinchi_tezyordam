@@ -26,7 +26,7 @@
     <div class="container">
         <div class="video-grid">
             {% for video in videolar %}
-            <div class="video-card" onclick="videoOch('{{ video.id }}')">
+            <div class="video-card" onclick="{% if video.is_local %}videoOch('{{ video.id }}'){% else %}window.open('{{ video.youtube_url }}','_blank'){% endif %}">
                 <div class="video-card-thumb">
                     {% if video.thumbnail %}
                     <img src="{{ video.thumbnail }}" alt="{{ video.sarlavha }}">
