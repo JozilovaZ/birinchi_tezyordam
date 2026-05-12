@@ -60,14 +60,16 @@
                         <video id="player-{{ video.id }}" controls style="width:100%;border-radius:8px;max-height:70vh;">
                             <source src="{{ video.video_fayl.url }}" type="video/mp4">
                         </video>
-                        {% elif video.youtube_id %}
-                        <iframe id="player-{{ video.id }}"
-                            src=""
-                            data-src="https://www.youtube.com/embed/{{ video.youtube_id }}?autoplay=1"
-                            width="100%" height="400"
-                            frameborder="0" allowfullscreen allow="autoplay; encrypted-media"
-                            style="border-radius:8px;">
-                        </iframe>
+                        {% elif video.youtube_url %}
+                        <div id="player-{{ video.id }}" style="text-align:center;padding:40px 20px;">
+                            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="1.5" style="margin-bottom:16px"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+                            <p style="color:#374151;margin-bottom:20px;font-size:1rem;">{{ video.sarlavha }}</p>
+                            <a href="{{ video.youtube_url }}" target="_blank"
+                               style="display:inline-flex;align-items:center;gap:8px;background:#dc2626;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                YouTube'da ko'rish
+                            </a>
+                        </div>
                         {% endif %}
                     </div>
                 </div>
